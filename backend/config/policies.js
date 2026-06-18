@@ -19,4 +19,9 @@ module.exports.policies = {
 
   '*': false,
 
+  // Cho phép truy cập api đăng ký tự do
+  'CustomerController': {
+    register: true
+  }
+
 };
