@@ -23,6 +23,10 @@ module.exports.policies = {
   'CustomerController': {
     register: true,
     login: true
+  },
+
+  'PocketController': {
+    '*': 'isLoggedIn'
   }
 
 };

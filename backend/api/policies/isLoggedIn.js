@@ -20,7 +20,7 @@ module.exports = async function (req, res, proceed) {
         }
 
         // Nếu hợp lệ, ta nhét id của user vào req để các controller phía sau sử dụng
-        req.me = decoded.customerId;
+        req.customerId = decoded.customerId;
 
         // Mời đi tiếp vào Controller
         return proceed();

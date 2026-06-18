@@ -23,6 +23,9 @@ module.exports.routes = {
   'POST /api/register': 'CustomerController.register',
   'POST /api/login': 'CustomerController.login',
 
+  //Xem số dư
+  'POST /api/pocket/balance': 'PocketController.getBalance'
+
   /***************************************************************************
   *                                                                          *
   * More custom routes here...                                               *
