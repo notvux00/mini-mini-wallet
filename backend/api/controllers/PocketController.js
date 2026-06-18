@@ -8,7 +8,7 @@ module.exports = {
             const pocket = await Pocket.findOne({ customer: customerId });
 
             if (!pocket) {
-                return res.error(4042, 'Không tìm thấy ví của bạn!');
+                return res.error(sails.services.respCode.POCKET_NOT_FOUND, 'Không tìm thấy ví của bạn!');
             }
 
             // Trả về số dư

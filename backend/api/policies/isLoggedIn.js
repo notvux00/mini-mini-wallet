@@ -5,7 +5,7 @@ module.exports = async function (req, res, proceed) {
     let token = req.header('Authorization');
 
     if (!token) {
-        return res.error(401, 'Bạn chưa đăng nhập!');
+        return res.error(sails.services.respCode.UNAUTHORIZED, 'Bạn chưa đăng nhập!');
     }
 
     // Token thường có dạng "Bearer xyz123...". Ta cần cắt bỏ chữ Bearer đi
@@ -16,7 +16,7 @@ module.exports = async function (req, res, proceed) {
     // Giải mã token để kiểm tra tính hợp lệ
     jwt.verify(token, 'chac-ai-do-se-ve', async function (err, decoded) {
         if (err) {
-            return res.error(401, 'Token không hợp lệ hoặc đã hết hạn!');
+            return res.error(sails.services.respCode.UNAUTHORIZED, 'Token không hợp lệ hoặc đã hết hạn!');
         }
 
         // Nếu hợp lệ, ta nhét id của user vào req để các controller phía sau sử dụng

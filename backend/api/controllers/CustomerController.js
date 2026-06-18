@@ -17,7 +17,7 @@ module.exports = {
             // Kiểm tra xem số điện thoại đã tồn tại chưa
             const existingCustomer = await Customer.findOne({ phone: phone });
             if (existingCustomer) {
-                return res.error(400, 'Số điện thoại này đã được đăng ký!');
+                return res.error(sails.services.respCode.PHONE_EXISTS, 'Số điện thoại này đã được đăng ký!');
             }
 
             // Mã hóa mật khẩu
@@ -65,13 +65,13 @@ module.exports = {
             // Kiểm tra số điện thoại có tồn tại không
             const existingCustomer = await Customer.findOne({ phone: phone });
             if (!existingCustomer) {
-                return res.error(400, 'Số điện thoại này chưa được đăng ký!');
+                return res.error(sails.services.respCode.PHONE_NOT_FOUND, 'Số điện thoại này chưa được đăng ký!');
             }
 
             // Kiểm tra mật khẩu có đúng không
             const isPasswordValid = bcrypt.compareSync(password, existingCustomer.password);
             if (!isPasswordValid) {
-                return res.error(400, 'Mật khẩu không đúng!');
+                return res.error(sails.services.respCode.WRONG_PASSWORD, 'Mật khẩu không đúng!');
             }
 
             // Đăng nhập thành công -> Tạo token

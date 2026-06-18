@@ -2,5 +2,11 @@ module.exports = {
     SUCCESS: 200,
     BAD_REQUEST: 400,
     SERVER_ERROR: 500,
-    // Sau này có lỗi nghiệp vụ gì riêng (như Sai mật khẩu, Thiếu số dư...) ta sẽ khai báo thêm ở đây.
+
+    // Các lỗi nghiệp vụ
+    UNAUTHORIZED: 401,
+    PHONE_EXISTS: 4001,
+    PHONE_NOT_FOUND: 4041,
+    WRONG_PASSWORD: 4002,
+    POCKET_NOT_FOUND: 4042,
 };
