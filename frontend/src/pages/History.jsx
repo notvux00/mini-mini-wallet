@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { RESP_CODE } from '../utils/respcode';
 
 function History() {
     const [transactions, setTransactions] = useState([]);
@@ -16,11 +17,11 @@ function History() {
         try {
             const response = await axiosClient.post('/transactions/history');
 
-            if (response.data.err === 200) {
+            if (response.data.err === RESP_CODE.SUCCESS) {
                 setTransactions(response.data.data.transactions);
             } else {
                 alert('Lỗi lấy lịch sử do không tìm thấy ví: ' + response.data.message);
-                if (response.data.err === 4042) {
+                if (response.data.err === RESP_CODE.POCKET_NOT_FOUND) {
                     navigate('/login');
                 }
             }

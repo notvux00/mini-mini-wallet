@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { RESP_CODE } from '../utils/respcode';
 
 function Login() {
     const [phone, setPhone] = useState('');
@@ -13,7 +14,7 @@ function Login() {
         try {
             const response = await axiosClient.post('/login', { phone, password });
 
-            if (response.data.err === 200) {
+            if (response.data.err === RESP_CODE.SUCCESS) {
                 const token = response.data.data.token;
                 const fullName = response.data.data.customer?.fullName;
                 localStorage.setItem('token', token);

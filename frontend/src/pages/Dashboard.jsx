@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { RESP_CODE } from '../utils/respcode';
 
 function Dashboard() {
     const [balance, setBalance] = useState(0);
@@ -22,13 +23,13 @@ function Dashboard() {
                 axiosClient.post('/transactions/history')
             ]);
 
-            if (balRes.data.err === 200) {
+            if (balRes.data.err === RESP_CODE.SUCCESS) {
                 setBalance(balRes.data.data.balance);
-            } else if (balRes.data.err === 401 || balRes.data.err === 4041) {
+            } else if (balRes.data.err === RESP_CODE.UNAUTHORIZED || balRes.data.err === RESP_CODE.PHONE_NOT_FOUND) {
                 return handleLogout();
             }
 
-            if (txRes.data.err === 200) {
+            if (txRes.data.err === RESP_CODE.SUCCESS) {
                 setRecentTx(txRes.data.data.transactions.slice(0, 5));
             }
         } catch (error) {

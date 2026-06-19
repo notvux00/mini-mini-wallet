@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { RESP_CODE } from '../utils/respcode';
 
 function Register() {
     const [phone, setPhone] = useState('');
@@ -19,7 +20,7 @@ function Register() {
                 fullName: fullName
             });
 
-            if (response.data.err === 200) {
+            if (response.data.err === RESP_CODE.SUCCESS) {
                 alert('Đăng ký thành công và đã được cấp ví!');
                 navigate('/login');
             } else {

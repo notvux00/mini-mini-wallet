@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import { RESP_CODE } from '../utils/respcode';
 
 function Transfer() {
     const [receiverPhone, setReceiverPhone] = useState('');
@@ -25,12 +26,12 @@ function Transfer() {
                 description: description
             });
 
-            if (response.data.err === 200) {
+            if (response.data.err === RESP_CODE.SUCCESS) {
                 alert('Chuyển tiền thành công!');
                 navigate('/history'); // Chuyển thẳng sang trang Lịch sử để xem luôn cho đã!
             } else {
                 alert('Lỗi: ' + response.data.message);
-                if (response.data.err === 401) navigate('/login');
+                if (response.data.err === RESP_CODE.UNAUTHORIZED) navigate('/login');
             }
         } catch (error) {
             alert('Lỗi kết nối Backend');
