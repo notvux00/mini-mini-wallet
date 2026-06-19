@@ -23,8 +23,9 @@ module.exports = {
             // Xác định loại giao dịch là Gửi hay Nhận
             const formattedTx = transactions.map(tx => {
                 const isSender = tx.senderPocket === myPocket.id;
+                const plainTx = typeof tx.toJSON === 'function' ? tx.toJSON() : tx;
                 return {
-                    ...tx,
+                    ...plainTx,
                     type: isSender ? 'send' : 'receive'
                 };
             });
