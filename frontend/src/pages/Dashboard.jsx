@@ -97,13 +97,12 @@ function Dashboard() {
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 {recentTx.map((tx, idx) => (
                                     <div className="tx-item" key={idx} style={{ padding: '12px 0' }}>
-                                        <div className="tx-icon">🔄</div>
                                         <div className="tx-info">
-                                            <div className="tx-title">{tx.description || 'Chuyển tiền'}</div>
+                                            <div className="tx-title">{tx.description || (tx.type === 'send' ? 'Chuyển tiền' : 'Nhận tiền')}</div>
                                             <div className="tx-time">{new Date(tx.createdAt).toLocaleDateString('vi-VN')}</div>
                                         </div>
-                                        <div className="tx-amount" style={{ color: 'var(--text-main)' }}>
-                                            {tx.amount.toLocaleString('vi-VN')} đ
+                                        <div className="tx-amount" style={{ color: tx.type === 'send' ? '#ef4444' : '#10b981' }}>
+                                            {tx.type === 'send' ? '-' : '+'}{tx.amount.toLocaleString('vi-VN')} đ
                                         </div>
                                     </div>
                                 ))}

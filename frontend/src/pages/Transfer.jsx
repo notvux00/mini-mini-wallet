@@ -41,7 +41,7 @@ function Transfer() {
 
     return (
         <div className="card" style={{ width: '400px' }}>
-            <h2 style={{ marginBottom: '20px', textAlign: 'center' }}>Chuyển tiền 💸</h2>
+            <h2 style={{ marginBottom: '20px', textAlign: 'center' }}>Chuyển tiền</h2>
 
             <form onSubmit={handleTransfer} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div>
@@ -86,7 +86,7 @@ function Transfer() {
                     onClick={() => navigate('/dashboard')}
                     className="btn-secondary"
                 >
-                    Hủy / Quay lại
+                    Quay lại
                 </button>
             </form>
         </div>

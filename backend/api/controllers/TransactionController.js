@@ -20,7 +20,16 @@ module.exports = {
                 }
             }).sort('createdAt DESC');
 
-            return res.ok({ transactions: transactions }, 'Lấy lịch sử giao dịch thành công!');
+            // Xác định loại giao dịch là Gửi hay Nhận
+            const formattedTx = transactions.map(tx => {
+                const isSender = tx.senderPocket === myPocket.id;
+                return {
+                    ...tx,
+                    type: isSender ? 'send' : 'receive'
+                };
+            });
+
+            return res.ok({ transactions: formattedTx }, 'Lấy lịch sử giao dịch thành công!');
 
         } catch (err) {
             return res.serverError(err);
