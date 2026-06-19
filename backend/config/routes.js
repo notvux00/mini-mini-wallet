@@ -27,7 +27,10 @@ module.exports.routes = {
   'POST /api/pocket/balance': 'PocketController.getBalance',
 
   // Xem lịch sử giao dịch
-  'POST /api/transactions/history': 'TransactionController.getTransactionHistory'
+  'POST /api/transactions/history': 'TransactionController.getTransactionHistory',
+
+  // Giao dịch chuyển tiền
+  'POST /api/transaction/transfer': 'TransactionController.transfer',
 
   /***************************************************************************
   *                                                                          *

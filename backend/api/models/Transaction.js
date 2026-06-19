@@ -4,7 +4,7 @@ module.exports = {
             type: 'number',
             required: true // Số tiền giao dịch
         },
-        note: {
+        description: {
             type: 'string' // Ghi chú giao dịch
         },
 

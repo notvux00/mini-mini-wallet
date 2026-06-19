@@ -32,7 +32,7 @@ function Register() {
     };
 
     return (
-        <div className="glass-card">
+        <div className="card" style={{ width: '380px' }}>
             <h3>Mở tài khoản mới</h3>
             <form onSubmit={handleRegister}>
                 <div className="form-group">

@@ -15,7 +15,9 @@ function Login() {
 
             if (response.data.err === 200) {
                 const token = response.data.data.token;
+                const fullName = response.data.data.customer?.fullName;
                 localStorage.setItem('token', token);
+                if (fullName) localStorage.setItem('fullName', fullName);
 
                 navigate('/dashboard');
             } else {
@@ -28,7 +30,7 @@ function Login() {
     };
 
     return (
-        <div className="glass-card">
+        <div className="card" style={{ width: '380px' }}>
             <h3>Đăng nhập</h3>
             <form onSubmit={handleLogin}>
                 <div className="form-group">
