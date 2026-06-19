@@ -27,6 +27,9 @@ module.exports.policies = {
 
   'PocketController': {
     '*': 'isLoggedIn'
-  }
+  },
 
+  'TransactionController': {
+    '*': 'isLoggedIn'
+  }
 };

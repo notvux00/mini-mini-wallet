@@ -23,8 +23,11 @@ module.exports.routes = {
   'POST /api/register': 'CustomerController.register',
   'POST /api/login': 'CustomerController.login',
 
-  //Xem số dư
-  'POST /api/pocket/balance': 'PocketController.getBalance'
+  // Xem số dư
+  'POST /api/pocket/balance': 'PocketController.getBalance',
+
+  // Xem lịch sử giao dịch
+  'POST /api/transactions/history': 'TransactionController.getTransactionHistory'
 
   /***************************************************************************
   *                                                                          *
