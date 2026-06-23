@@ -80,52 +80,65 @@ module.exports = {
             // Logic cho chuyển tiền
             // 1. Lấy kết nối gốc (Native Driver) của MongoDB từ Sails
             const db = Pocket.getDatastore().manager;
+            // db có thể là Db object hoặc MongoClient tùy vào cấu hình, ta trích xuất client để dùng session
+            const client = db.client || db; 
             const rawPocketCollection = db.collection(Pocket.tableName);
+            const rawTransactionCollection = db.collection(Transaction.tableName || 'transaction');
             const ObjectId = require('mongodb').ObjectId; // Ép kiểu ID của MongoDB
 
-            // PHASE 1: TRỪ TIỀN NGƯỜI GỬI (Kèm điều kiện số dư)
-            // findOneAndUpdate sẽ khóa bản ghi lại trong tích tắc để xử lý
-            const senderUpdate = await rawPocketCollection.findOneAndUpdate(
-                {
-                    _id: new ObjectId(senderPocket.id),
-                    balance: { $gte: amount } // Điều kiện tối quan trọng: Số dư phải LỚN HƠN HOẶC BẰNG số tiền gửi
-                },
-                { $inc: { balance: -amount } }, // Trừ tiền (nguyên tử)
-                { returnDocument: 'after' }
-            );
+            const session = client.startSession();
 
-            // Xử lý an toàn: Lấy kết quả trả về tương thích với mọi phiên bản MongoDB
-            const updatedDoc = (senderUpdate && senderUpdate.value !== undefined) ? senderUpdate.value : senderUpdate;
-
-            // Nếu updatedDoc là null, nghĩa là điều kiện balance >= amount không thỏa mãn (hoặc sai ID)
-            if (!updatedDoc) {
-                return res.error(sails.services.respcode.INSUFFICIENT_BALANCE, 'Số dư của bạn không đủ để thực hiện giao dịch!');
-            }
-
-            // PHASE 2: CỘNG TIỀN NGƯỜI NHẬN & MANUAL ROLLBACK
             try {
+                session.startTransaction();
+
+                // PHASE 1: TRỪ TIỀN NGƯỜI GỬI (Kèm điều kiện số dư)
+                const senderUpdate = await rawPocketCollection.findOneAndUpdate(
+                    {
+                        _id: new ObjectId(senderPocket.id),
+                        balance: { $gte: amount } // Điều kiện tối quan trọng: Số dư phải LỚN HƠN HOẶC BẰNG số tiền gửi
+                    },
+                    { $inc: { balance: -amount } }, // Trừ tiền (nguyên tử)
+                    { returnDocument: 'after', session }
+                );
+
+                // Xử lý an toàn: Lấy kết quả trả về tương thích với mọi phiên bản MongoDB
+                const updatedDoc = (senderUpdate && senderUpdate.value !== undefined) ? senderUpdate.value : senderUpdate;
+
+                // Nếu updatedDoc là null, nghĩa là điều kiện balance >= amount không thỏa mãn (hoặc sai ID)
+                if (!updatedDoc) {
+                    await session.abortTransaction();
+                    session.endSession();
+                    return res.error(sails.services.respcode.INSUFFICIENT_BALANCE, 'Số dư của bạn không đủ để thực hiện giao dịch!');
+                }
+
+                // PHASE 2: CỘNG TIỀN NGƯỜI NHẬN
                 await rawPocketCollection.updateOne(
                     { _id: new ObjectId(receiverPocket.id) },
-                    { $inc: { balance: amount } } // Cộng tiền (nguyên tử)
+                    { $inc: { balance: amount } }, // Cộng tiền (nguyên tử)
+                    { session }
                 );
-            } catch (phase2Error) {
-                // CHẾ ĐỘ CỨU HỘ: NẾU CỘNG TIỀN BỊ LỖI -> HOÀN TIỀN LẠI CHO NGƯỜI GỬI (ROLLBACK)
-                sails.log.error('Lỗi cộng tiền, đang tiến hành Rollback...', phase2Error);
-                await rawPocketCollection.updateOne(
-                    { _id: new ObjectId(senderPocket.id) },
-                    { $inc: { balance: amount } }
-                );
-                return res.serverError(phase2Error, 'Hệ thống gián đoạn, tiền của bạn đã được hoàn lại!');
+
+                // PHASE 3: GHI NHẬN LỊCH SỬ GIAO DỊCH
+                const now = Date.now();
+                await rawTransactionCollection.insertOne({
+                    senderPocket: new ObjectId(senderPocket.id),
+                    receiverPocket: new ObjectId(receiverPocket.id),
+                    amount: amount,
+                    description: description || 'Chuyển tiền',
+                    createdAt: now,
+                    updatedAt: now
+                }, { session });
+
+                await session.commitTransaction();
+                session.endSession();
+
+                return res.ok(null, 'Chuyển tiền thành công!');
+            } catch (transactionErr) {
+                await session.abortTransaction();
+                session.endSession();
+                sails.log.error('Lỗi giao dịch, đã Rollback an toàn:', transactionErr);
+                return res.serverError(transactionErr, 'Hệ thống gián đoạn, giao dịch đã được hủy bỏ!');
             }
-            // PHASE 3: GHI NHẬN LỊCH SỬ GIAO DỊCH
-            await Transaction.create({
-                senderPocket: senderPocket.id,
-                receiverPocket: receiverPocket.id,
-                amount: amount,
-                description: description || 'Chuyển tiền'
-            });
-            return res.ok(null, 'Chuyển tiền thành công!');
-        } catch (err) {
             return res.serverError(err);
         }
     }
