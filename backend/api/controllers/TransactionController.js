@@ -81,7 +81,7 @@ module.exports = {
             // 1. Lấy kết nối gốc (Native Driver) của MongoDB từ Sails
             const db = Pocket.getDatastore().manager;
             // db có thể là Db object hoặc MongoClient tùy vào cấu hình, ta trích xuất client để dùng session
-            const client = db.client || db; 
+            const client = db.client || db;
             const rawPocketCollection = db.collection(Pocket.tableName);
             const rawTransactionCollection = db.collection(Transaction.tableName || 'transaction');
             const ObjectId = require('mongodb').ObjectId; // Ép kiểu ID của MongoDB
@@ -139,6 +139,7 @@ module.exports = {
                 sails.log.error('Lỗi giao dịch, đã Rollback an toàn:', transactionErr);
                 return res.serverError(transactionErr, 'Hệ thống gián đoạn, giao dịch đã được hủy bỏ!');
             }
+        } catch (err) {
             return res.serverError(err);
         }
     }
